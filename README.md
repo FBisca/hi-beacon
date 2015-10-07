@@ -84,8 +84,11 @@ Receive listener calls
 
 Get Offers
 ```java
+	//Access token for the Offer API
+	String accessToken = "95ac2da6a85c8ac3914fe22366380a27";
+	
 	// This method needs a internet connection
-	mDevice.getOffers(new OfferListener() {
+	mDevice.getOffers(accessToken, new OfferListener() {
 		@Override
 		public void onOffersObtained(Place place, List<Offer> offers) {
 			

@@ -20,6 +20,11 @@ import br.com.hive.hibeacon.network.Network;
 public class SendBeaconTask extends AsyncTask<Device, Void, SendBeaconTask.Result> {
 
     protected String errorMessage;
+    private volatile String mAppAccessToken;
+
+    public SendBeaconTask(String appAccessToken) {
+        this.mAppAccessToken = appAccessToken;
+    }
 
     @Override
     protected SendBeaconTask.Result doInBackground(Device... params) {
@@ -28,18 +33,18 @@ public class SendBeaconTask extends AsyncTask<Device, Void, SendBeaconTask.Resul
             return null;
         }
 
-        String response = Network.create("http://ambev.beacons.hive.com.br/services/ws")
+        Network.Response response = Network.create("http://ambev.beacons.hive.com.br/services/ws")
                 .setMethod(Network.Method.POST)
                 .addParameter("action", "getOffers")
-                .addParameter("app_access_token", "95ac2da6a85c8ac3914fe22366380a27")
+                .addParameter("app_access_token", mAppAccessToken)
                 .addParameter("beacon_uuid", params[0].getUUID().toString())
                 .addParameter("beacon_bt_major", params[0].getMajor())
                 .addParameter("beacon_bt_minor", params[0].getMinor())
                 .addParameter("age_gate", "Y").request();
 
-        if (response != null) {
+        if (response.getError() != null) {
             try {
-                JSONObject obj = new JSONObject(response);
+                JSONObject obj = new JSONObject(response.getResponse());
                 if (obj.getInt("error") == 1) {
                     errorMessage = obj.getString("msg");
                 } else {
@@ -50,6 +55,7 @@ public class SendBeaconTask extends AsyncTask<Device, Void, SendBeaconTask.Resul
                 return null;
             }
         }
+
         errorMessage = "Communication error";
         return null;
     }

@@ -24,6 +24,7 @@ import br.com.hive.hibeacon.core.model.Place;
 public class OfferActivity extends AppCompatActivity implements OfferListener {
 
     public static final String ARG_DEVICE = "arg_device";
+    public static final String SAMPLE_TOKEN = "95ac2da6a85c8ac3914fe22366380a27";
 
     private List<Offer> offerList = null;
     private OfferAdapter mAdapter;
@@ -32,6 +33,7 @@ public class OfferActivity extends AppCompatActivity implements OfferListener {
     private TextView mTxtMsg;
 
     private Device mDevice;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +84,7 @@ public class OfferActivity extends AppCompatActivity implements OfferListener {
         if (offerList == null && mDevice != null) {
             mProgressBar.setVisibility(View.VISIBLE);
             mTxtMsg.setVisibility(View.GONE);
-            mDevice.getOffers(this);
+            mDevice.getOffers(SAMPLE_TOKEN, this);
         }
     }
 

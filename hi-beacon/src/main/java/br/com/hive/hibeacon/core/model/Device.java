@@ -206,13 +206,13 @@ public class Device implements Parcelable {
      *
      * @param listener OfferListener used to callback
      */
-    public void getOffers(final OfferListener listener) {
+    public void getOffers(final String accessToken, final OfferListener listener) {
         if (listener != null) {
             if (mTask != null) {
                 mTask.cancel(true);
             }
 
-            mTask = new SendBeaconTask() {
+            mTask = new SendBeaconTask(accessToken) {
                 @Override
                 protected void onPostExecute(SendBeaconTask.Result result) {
                     super.onPostExecute(result);
