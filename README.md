@@ -106,6 +106,7 @@ Get Offers
 			}
 		}
 	});
+	
 ```
 
 When the operation is finished, stop the scanner

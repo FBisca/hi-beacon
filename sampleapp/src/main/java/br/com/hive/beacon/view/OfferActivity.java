@@ -1,4 +1,4 @@
-package br.com.hive.beacon.view;
+﻿package br.com.hive.beacon.view;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -33,7 +33,6 @@ public class OfferActivity extends AppCompatActivity implements OfferListener {
     private TextView mTxtMsg;
 
     private Device mDevice;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
