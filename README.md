@@ -95,8 +95,15 @@ Get Offers
 		}
 
 		@Override
-		public void onError(String message) {
-
+		public void onError(ApiException error) {
+			
+			if (error instanceof ServiceException) { // Check if it's an error from API Service
+				String message = error.getMessage(); // Retrieves the API Service error message;
+				
+			} else if (error instanceof TimeoutException) { // Check if a timeout was fired before the request completion
+			
+			} else { // A Generic API error, check the message for details. May be a JSONException, Parameters missing, UnknownHostException, etc.
+			}
 		}
 	});
 ```

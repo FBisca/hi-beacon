@@ -100,10 +100,12 @@ public class OfferActivity extends AppCompatActivity implements OfferListener {
     }
 
     @Override
-    public void onError(String message) {
-        mProgressBar.setVisibility(View.GONE);
-        mTxtMsg.setVisibility(View.VISIBLE);
-        mTxtMsg.setText(message);
+    public void onError(ApiException error) {
+        if (error instanceof ServiceException) {
+            mProgressBar.setVisibility(View.GONE);
+            mTxtMsg.setVisibility(View.VISIBLE);
+            mTxtMsg.setText(error.getMessage());
+        }
     }
 
     @Override
