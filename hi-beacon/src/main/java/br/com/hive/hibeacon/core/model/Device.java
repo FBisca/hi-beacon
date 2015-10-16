@@ -216,8 +216,8 @@ public class Device implements Parcelable {
                 @Override
                 protected void onPostExecute(SendBeaconTask.Result result) {
                     super.onPostExecute(result);
-                    if (result == null) {
-                        listener.onError(errorMessage);
+                    if (result.getError() != null) {
+                        listener.onError(result.getError());
                     } else {
                         listener.onOffersObtained(result.getPlace(), result.getOfferList());
                     }

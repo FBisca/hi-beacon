@@ -6,9 +6,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.hive.hibeacon.core.exceptions.ApiException;
+import br.com.hive.hibeacon.core.exceptions.ServiceException;
+import br.com.hive.hibeacon.core.exceptions.TimeoutException;
 import br.com.hive.hibeacon.core.model.Device;
 import br.com.hive.hibeacon.core.model.Offer;
 import br.com.hive.hibeacon.core.model.Place;
@@ -19,7 +23,6 @@ import br.com.hive.hibeacon.network.Network;
  */
 public class SendBeaconTask extends AsyncTask<Device, Void, SendBeaconTask.Result> {
 
-    protected String errorMessage;
     private volatile String mAppAccessToken;
 
     public SendBeaconTask(String appAccessToken) {
@@ -29,8 +32,7 @@ public class SendBeaconTask extends AsyncTask<Device, Void, SendBeaconTask.Resul
     @Override
     protected SendBeaconTask.Result doInBackground(Device... params) {
         if (params.length <= 0) {
-            errorMessage = "SendBeaconTask params is empty";
-            return null;
+            return new Result(new ApiException("SendBeaconTask params is empty"));
         }
 
         Network.Response response = Network.create("http://ambev.beacons.hive.com.br/services/ws")
@@ -42,22 +44,23 @@ public class SendBeaconTask extends AsyncTask<Device, Void, SendBeaconTask.Resul
                 .addParameter("beacon_bt_minor", params[0].getMinor())
                 .addParameter("age_gate", "Y").request();
 
-        if (response.getError() != null) {
+        if (response.getError() == null) {
             try {
                 JSONObject obj = new JSONObject(response.getResponse());
                 if (obj.getInt("error") == 1) {
-                    errorMessage = obj.getString("msg");
+                    return new Result(new ServiceException(obj.getString("msg")));
                 } else {
                     return parseResult(obj);
                 }
             } catch (JSONException e) {
-                errorMessage = "JSONException: " + e.getMessage();
-                return null;
+                return new Result(new ApiException("JSONException: " + e.getMessage()));
             }
+        } else if (response.getError() instanceof SocketTimeoutException) {
+            return new Result(new TimeoutException());
+        } else {
+            return new Result(new ApiException(response.getError().getMessage()));
         }
 
-        errorMessage = "Communication error";
-        return null;
     }
 
     private SendBeaconTask.Result parseResult(JSONObject obj) throws JSONException {
@@ -90,20 +93,29 @@ public class SendBeaconTask extends AsyncTask<Device, Void, SendBeaconTask.Resul
     }
 
     public class Result {
-        private Place place;
-        private List<Offer> offerList;
+        private ApiException mError;
+        private Place mPlace;
+        private List<Offer> mOfferList;
+
+        public Result(ApiException mError) {
+            this.mError = mError;
+        }
 
         public Result(Place place, List<Offer> offerList) {
-            this.place = place;
-            this.offerList = offerList;
+            this.mPlace = place;
+            this.mOfferList = offerList;
         }
 
         public List<Offer> getOfferList() {
-            return offerList;
+            return mOfferList;
         }
 
         public Place getPlace() {
-            return place;
+            return mPlace;
+        }
+
+        public ApiException getError() {
+            return mError;
         }
     }
 }
